@@ -1,5 +1,6 @@
 package blog.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Post {
@@ -7,7 +8,7 @@ public class Post {
     private String text;
     private String category;
     private Date createdDate;
-
+    private SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
     public Post(String title, String text, String category, Date createdDate) {
         this.title = title;
         this.text = text;
@@ -74,11 +75,10 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{" +
-                "title='" + title + '\'' +
-                ", text='" + text + '\'' +
-                ", category='" + category + '\'' +
-                ", createdDate=" + createdDate +
-                '}';
+        return  " title: " + title + '\n' +
+                " category: " + category + '\n' +
+                " text: " + text + '\n' +
+                " createdDate: " + sdf.format(createdDate);
+
     }
 }

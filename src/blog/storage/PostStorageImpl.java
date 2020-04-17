@@ -50,9 +50,11 @@ public class PostStorageImpl implements PostStorage {
 
     @Override
     public void printAllPosts() {
+        System.out.println("-----------------------------");
         for (int i = 0; i < size; i++) {
             System.out.println(posts[i]);
         }
+        System.out.println("-----------------------------");
     }
 
     @Override

@@ -9,12 +9,13 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class BlogMain implements Commands {
-    public static PostStorageImpl postStorage = new PostStorageImpl();
+    public static PostStorageImpl POST_STORAGE = new PostStorageImpl();
     public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         boolean isRun = true;
         while (isRun) {
+            POST_STORAGE.printAllPosts();
             printCommands();
             String comandsStr = scanner.nextLine();
             int command;
@@ -65,7 +66,7 @@ public class BlogMain implements Commands {
                 System.out.println("Incorrect value! Please try again");
                 addPost();
             } else {
-                postStorage.add(post);
+                POST_STORAGE.add(post);
                 System.out.println("Post was added!");
             }
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -75,14 +76,14 @@ public class BlogMain implements Commands {
     }
 
     private static void searchPost() {
-        if (postStorage.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         } else {
             System.out.println("Please input data of post");
         }
         String keyword = scanner.nextLine();
-        Post post = postStorage.searchPostsByKeyword(keyword);
+        Post post = POST_STORAGE.searchPostsByKeyword(keyword);
         if (post != null) {
             System.out.println(post);
         } else {
@@ -91,15 +92,15 @@ public class BlogMain implements Commands {
     }
 
     private static void postByTitle() {
-        if (postStorage.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         }
-        postStorage.printAllPosts();
+        POST_STORAGE.printAllPosts();
         System.out.println("Please input post title");
         String title = scanner.nextLine();
         try {
-            Post postByTitle = postStorage.getPostByTitle(title);
+            Post postByTitle = POST_STORAGE.getPostByTitle(title);
             System.out.println(postByTitle);
 
         } catch (PostNotFoundException e) {
@@ -108,14 +109,14 @@ public class BlogMain implements Commands {
     }
 
     private static void postByCategory() {
-        if (postStorage.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         } else {
             System.out.println("Please input category");
         }
         String category = scanner.nextLine();
-        Post post = postStorage.printPostsByCategory(category);
+        Post post = POST_STORAGE.printPostsByCategory(category);
         if (post != null) {
             System.out.println(post);
         } else {
@@ -124,11 +125,11 @@ public class BlogMain implements Commands {
     }
 
     private static void allPost() {
-        if (postStorage.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         }
-        postStorage.printAllPosts();
+        POST_STORAGE.printAllPosts();
     }
 
 
