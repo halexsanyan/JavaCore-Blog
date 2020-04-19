@@ -1,23 +1,29 @@
 package blog;
 
 
-import blog.exception.PostNotFoundException;
+import blog.exception.ModelNodFoundException;
 import blog.model.Post;
+import blog.model.User;
 import blog.storage.PostStorageImpl;
+import blog.storage.UserStorageImpl;
 
+import javax.jws.soap.SOAPBinding;
+import javax.rmi.CORBA.StubDelegate;
 import java.util.Date;
 import java.util.Scanner;
 
 public class BlogMain implements Commands {
-    public static PostStorageImpl POST_STORAGE = new PostStorageImpl();
-    public static Scanner scanner = new Scanner(System.in);
+    public static final PostStorageImpl POST_STORAGE = new PostStorageImpl();
+    public static final UserStorageImpl USER_STORAGE = new UserStorageImpl();
+    public static Scanner SCANNER = new Scanner(System.in);
+    public static User currentUser = null;
 
     public static void main(String[] args) {
         boolean isRun = true;
         while (isRun) {
             POST_STORAGE.printAllPosts();
-            printCommands();
-            String comandsStr = scanner.nextLine();
+            Commands.printMainCommands();
+            String comandsStr = SCANNER.nextLine();
             int command;
             try {
                 command = Integer.parseInt(comandsStr);
@@ -28,14 +34,14 @@ public class BlogMain implements Commands {
                 case EXIT:
                     isRun = false;
                     break;
-                case ADD_POST:
-                    addPost();
+                case LOGIN:
+                    login();
+                    break;
+                case REGISTER:
+                    register();
                     break;
                 case SEARCH_POST:
                     searchPost();
-                    break;
-                case POST_BY_TITLE:
-                    postByTitle();
                     break;
                 case POST_BY_CATEGORY:
                     postByCategory();
@@ -51,17 +57,84 @@ public class BlogMain implements Commands {
         }
     }
 
+    private static void login() {
+        System.out.println("Please input: email, passwotd ");
+        String userStr = SCANNER.nextLine();
+        String[] userData = userStr.split(",");
+        try {
+            currentUser = USER_STORAGE.getUserByEmailAndPassword(userData[0], userData[1]);
+             loginUser();
+        } catch (ModelNodFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("please try again");
+            login();
+        }
+    }
+
+    private static void loginUser() {
+        boolean isRun = true;
+        while (isRun) {
+            Commands.printUserCommands();
+            String comandsStr = SCANNER.nextLine();
+            int command;
+            try {
+                command = Integer.parseInt(comandsStr);
+            } catch (NumberFormatException e) {
+                command = -1;
+            }
+            switch (command) {
+                case LOGOUT:
+                    isRun = false;
+                    break;
+                case ADD_POST:
+                    addPost();
+                    break;
+                case All_POSTS:
+                    allPost();
+                    break;
+                default:
+                    System.out.println("Wrong command");
+            }
+        }
+    }
+
+    private static void register() {
+        System.out.println("Please input your data: name, surname, email, password");
+        try {
+            String userStr = SCANNER.nextLine();
+            String[] userData = userStr.split(",");
+            User user = new User();
+            user.setName(userData[0]);
+            user.setSurname(userData[1]);
+            user.setEmail(userData[2]);
+            user.setPassvord(userData[3]);
+            try {
+                USER_STORAGE.getUserByEmail(userData[3]);
+                System.out.println("Email already exist");
+
+            } catch (ModelNodFoundException e) {
+                USER_STORAGE.add(user);
+                System.out.println("Thank you!");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Wrong imput");
+            register();
+        }
+    }
+
     private static void addPost() {
         System.out.println("Please input Post data: title, text, categoty");
         try {
-            String postDataStr = scanner.nextLine();
+            String postDataStr = SCANNER.nextLine();
             String[] postData = postDataStr.split(",");
             Post post = new Post();
             post.setTitle(postData[0]);
             post.setText(postData[1]);
             post.setCategory(postData[2]);
-            Date date = new Date();
-            post.setCreatedDate(date);
+            post.setUser(currentUser);
+            post.setCreatedDate(new Date());
             if (postData.length > 3) {
                 System.out.println("Incorrect value! Please try again");
                 addPost();
@@ -82,30 +155,8 @@ public class BlogMain implements Commands {
         } else {
             System.out.println("Please input data of post");
         }
-        String keyword = scanner.nextLine();
-        Post post = POST_STORAGE.searchPostsByKeyword(keyword);
-        if (post != null) {
-            System.out.println(post);
-        } else {
-            System.out.println("There is not that post!");
-        }
-    }
-
-    private static void postByTitle() {
-        if (POST_STORAGE.isEmpty()) {
-            System.out.println("Nothing added!");
-            return;
-        }
-        POST_STORAGE.printAllPosts();
-        System.out.println("Please input post title");
-        String title = scanner.nextLine();
-        try {
-            Post postByTitle = POST_STORAGE.getPostByTitle(title);
-            System.out.println(postByTitle);
-
-        } catch (PostNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
+        String keyword = SCANNER.nextLine();
+        POST_STORAGE.searchPostsByKeyword(keyword);
     }
 
     private static void postByCategory() {
@@ -115,13 +166,8 @@ public class BlogMain implements Commands {
         } else {
             System.out.println("Please input category");
         }
-        String category = scanner.nextLine();
-        Post post = POST_STORAGE.printPostsByCategory(category);
-        if (post != null) {
-            System.out.println(post);
-        } else {
-            System.out.println("There is not that post!");
-        }
+        String category = SCANNER.nextLine();
+        POST_STORAGE.printPostsByCategory(category);
     }
 
     private static void allPost() {
@@ -132,14 +178,7 @@ public class BlogMain implements Commands {
         POST_STORAGE.printAllPosts();
     }
 
-
-    public static void printCommands() {
-        System.out.println("Please input " + EXIT + " for EXIT");
-        System.out.println("Please input " + ADD_POST + " for ADD POST");
-        System.out.println("Please input " + SEARCH_POST + " for SEARCH POST");
-        System.out.println("Please input " + POST_BY_TITLE + " for POST BY TITLE");
-        System.out.println("Please input " + POST_BY_CATEGORY + " for POST BY CATEGORY");
-        System.out.println("Please input " + ALL_POSTS + " for ALL POSTS");
-    }
 }
+
+
 

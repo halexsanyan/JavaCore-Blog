@@ -3,6 +3,9 @@ package blog.storage;
 
 import blog.exception.PostNotFoundException;
 import blog.model.Post;
+import blog.model.User;
+
+import javax.jws.soap.SOAPBinding;
 
 public class PostStorageImpl implements PostStorage {
     private Post[] posts;
@@ -40,12 +43,12 @@ public class PostStorageImpl implements PostStorage {
 
 
     @Override
-    public Post searchPostsByKeyword(String keyword) {
+    public void searchPostsByKeyword(String keyword) {
         for (int i = 0; i < size; i++) {
             if (posts[i].getTitle().contains(keyword) || posts[i].getText().contains(keyword)) {
-                return posts[i];
+                System.out.println(posts[i]);
             }
-        }return null;
+        }
     }
 
     @Override
@@ -58,12 +61,12 @@ public class PostStorageImpl implements PostStorage {
     }
 
     @Override
-    public Post printPostsByCategory(String category) {
+    public void printPostsByCategory(String category) {
         for (int i = 0; i < size; i++) {
             if (posts[i].getCategory().equals(category)) {
-                return  posts[i];
+                System.out.println(posts[i]);
             }
-        }return null;
+        }
     }
 
     @Override

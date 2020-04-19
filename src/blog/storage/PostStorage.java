@@ -8,8 +8,8 @@ public interface PostStorage {
 
     void add(Post post);
     Post getPostByTitle(String title) throws PostNotFoundException;
-    Post searchPostsByKeyword(String keyword);
+    void searchPostsByKeyword(String keyword);
     void printAllPosts();
-    Post printPostsByCategory(String category);
+    void printPostsByCategory(String category);
     boolean isEmpty();
 }
