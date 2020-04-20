@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class BlogMain implements Commands {
     public static final PostStorageImpl POST_STORAGE = new PostStorageImpl();
     public static final UserStorageImpl USER_STORAGE = new UserStorageImpl();
-    public static Scanner SCANNER = new Scanner(System.in);
+    public static final Scanner SCANNER = new Scanner(System.in);
     public static User currentUser = null;
 
     public static void main(String[] args) {
@@ -110,7 +110,7 @@ public class BlogMain implements Commands {
             user.setEmail(userData[2]);
             user.setPassvord(userData[3]);
             try {
-                USER_STORAGE.getUserByEmail(userData[3]);
+                USER_STORAGE.getUserByEmail(userData[2]);
                 System.out.println("Email already exist");
 
             } catch (ModelNodFoundException e) {
