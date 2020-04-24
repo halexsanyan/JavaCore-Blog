@@ -6,12 +6,12 @@ import java.util.Date;
 public class Post {
     private String title;
     private String text;
-    private String category;
+    private PostCategory category;
     private User user;
     private Date createdDate;
    // private SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
-    public Post(String title, String text, String category, User user, Date createdDate) {
+    public Post(String title, String text, PostCategory category, User user, Date createdDate) {
         this.title = title;
         this.text = text;
         this.category = category;
@@ -38,11 +38,11 @@ public class Post {
         this.text = text;
     }
 
-    public String getCategory() {
+    public PostCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(PostCategory category) {
         this.category = category;
     }
 
