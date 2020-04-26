@@ -5,21 +5,22 @@ import blog.exception.ModelNodFoundException;
 import blog.model.Post;
 import blog.model.PostCategory;
 import blog.model.User;
-import blog.storage.DataStorageImpl;
+import blog.storage.PostStorage;
+import blog.storage.UserStorage;
 
 import java.util.Date;
 import java.util.Scanner;
 
 public class BlogMain implements Commands {
-    public static final DataStorageImpl<User> USER_DATA_STORAGE = new DataStorageImpl<>();
-    public static final DataStorageImpl<Post> POST_DATA_STORAGE = new DataStorageImpl<>();
+    public static final UserStorage USER_STORAGE = new UserStorage();
+    public static final PostStorage POST_STORAGE = new PostStorage();
     public static final Scanner SCANNER = new Scanner(System.in);
     public static User currentUser = null;
 
     public static void main(String[] args) {
         boolean isRun = true;
         while (isRun) {
-            POST_DATA_STORAGE.printAllPosts();
+            POST_STORAGE.printAllPosts();
             Commands.printMainCommands();
             String comandsStr = SCANNER.nextLine();
             int command;
@@ -58,11 +59,11 @@ public class BlogMain implements Commands {
         String userStr = SCANNER.nextLine();
         String[] userData = userStr.split(",");
         try {
-            currentUser = USER_DATA_STORAGE.getUserByEmailAndPassword(userData[0], userData[1]);
+            currentUser = USER_STORAGE.getUserByEmailAndPassword(userData[0], userData[1]);
             loginUser();
         } catch (ModelNodFoundException e) {
             System.out.println(e.getMessage());
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (Exception e) {
             System.out.println("please try again");
             login();
         }
@@ -105,12 +106,12 @@ public class BlogMain implements Commands {
             user.setSurname(userData[1]);
             user.setEmail(userData[2]);
             user.setPassvord(userData[3]);
-            try {
-                USER_DATA_STORAGE.getUserByEmail(userData[2]);
-                System.out.println("Email already exist");
 
-            } catch (ModelNodFoundException e) {
-                USER_DATA_STORAGE.add(user);
+            User userByEmail = USER_STORAGE.getUserByEmail(userData[2]);
+            if (userByEmail != null) {
+                System.out.println("This email is already registered");
+            } else {
+                USER_STORAGE.addUser(userData[2], user);
                 System.out.println("Thank you!");
             }
 
@@ -135,7 +136,7 @@ public class BlogMain implements Commands {
                 System.out.println("Incorrect value! Please try again");
                 addPost();
             } else {
-                POST_DATA_STORAGE.add(post);
+                POST_STORAGE.addPsot(post);
                 System.out.println("Post was added!");
             }
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -148,18 +149,18 @@ public class BlogMain implements Commands {
     }
 
     private static void searchPost() {
-        if (POST_DATA_STORAGE.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         } else {
             System.out.println("Please input data of post");
         }
         String keyword = SCANNER.nextLine();
-        POST_DATA_STORAGE.searchPostsByKeyword(keyword);
+        POST_STORAGE.searchPostsByKeyword(keyword);
     }
 
     private static void postByCategory() {
-        if (POST_DATA_STORAGE.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         } else {
@@ -167,15 +168,15 @@ public class BlogMain implements Commands {
         }
         String category = SCANNER.nextLine();
         PostCategory postCategory = PostCategory.valueOf(category);
-        POST_DATA_STORAGE.printPostsByCategory(postCategory);
+        POST_STORAGE.printPostsByCategory(postCategory);
     }
 
     private static void allPost() {
-        if (POST_DATA_STORAGE.isEmpty()) {
+        if (POST_STORAGE.isEmpty()) {
             System.out.println("Nothing added!");
             return;
         }
-        POST_DATA_STORAGE.printAllPosts();
+        POST_STORAGE.printAllPosts();
     }
 
 }
